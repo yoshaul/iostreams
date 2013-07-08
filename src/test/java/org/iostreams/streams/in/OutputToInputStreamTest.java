@@ -2,6 +2,8 @@ package org.iostreams.streams.in;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +15,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Yossi Shaul
  */
 public class OutputToInputStreamTest {
+    private static final Logger log = LoggerFactory.getLogger(OutputToInputStreamTest.class);
 
     @Test
     public void simpleStringOutToIn() throws IOException {
@@ -52,7 +55,7 @@ public class OutputToInputStreamTest {
             stb.append(new String(buf, 0, read));
         }
         is.close();
-        System.out.println("Result: " + stb);
+        log.debug("Result: {}", stb.toString());
     }
 
     private void consumeAndCloseStream(InputStream in) throws IOException {
