@@ -29,7 +29,7 @@ import java.util.List;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * Tests the StringInputStream.
+ * Unit tests for {@link org.iostreams.streams.in.StringInputStream}.
  *
  * @author Yossi Shaul
  */

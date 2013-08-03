@@ -24,10 +24,15 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
+ * Unit tests for {@link org.iostreams.streams.in.OutputToInputStream}.
+ *
  * @author Yossi Shaul
  */
 public class OutputToInputStreamTest {
@@ -57,10 +62,82 @@ public class OutputToInputStreamTest {
             consumeAndCloseStream(in);
             Assert.fail("Should have thrown io exception");
         } catch (IOException e) {
-            // expected
+            // expected the exception thrown by the writer
             assertThat(e.getMessage()).endsWith("propagate this exception");
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalMonitorStateException.class);
         }
+    }
+
+    @Test
+    public void writerClosesBeforeReaderStarts() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        OutputToInputStream in = new OutputToInputStream() {
+            @Override
+            protected void write(OutputStream sink) throws IOException {
+                sink.write(7);
+                sink.close();
+                latch.countDown();
+            }
+        };
+
+        // call initialize to start the writer thread
+        Method initialize = OutputToInputStream.class.getDeclaredMethod("initializePipedStream");
+        initialize.setAccessible(true);
+        initialize.invoke(in);
+
+        // await for the writer to finish
+        latch.await(2, TimeUnit.SECONDS);
+        assertThat(latch.getCount()).as("Timed out waiting").isEqualTo(0);
+
+        // try to read
+        assertThat(in.read()).as("Read the same byte written").isEqualTo(7);
+        assertThat(in.read()).as("Expected end of stream").isEqualTo(-1);
+        in.close(); // assure close() finishes without exception
+    }
+
+    @Test
+    public void inputClosedWithoutReading() throws IOException {
+        OutputToInputStream in = new OutputToInputStream() {
+            @Override
+            protected void write(OutputStream sink) throws IOException {
+                // nop
+            }
+        };
+
+        in.close(); // no exception
+    }
+
+    @Test
+    public void readerClosesBeforeWriterFinished() throws Exception {
+        final CountDownLatch readerDoneLatch = new CountDownLatch(1);
+        final CountDownLatch writerDoneLatch = new CountDownLatch(1);
+        final Exception[] writerException = new Exception[1];
+        OutputToInputStream in = new OutputToInputStream() {
+            @Override
+            protected void write(OutputStream sink) throws IOException {
+                try {
+                    sink.write(1);
+                    // don't continue until reader closed
+                    readerDoneLatch.await(2, TimeUnit.SECONDS);
+                    assertThat(readerDoneLatch.getCount()).as("Timed out waiting").isEqualTo(0);
+                    sink.write(2);  // should throw an exception since the input stream is now closed
+                    Assert.fail("Should have got piped closed exception");
+                } catch (Exception e) {
+                    writerException[0] = e;
+                } finally {
+                    writerDoneLatch.countDown();
+                }
+            }
+        };
+
+        // read only one byte, close and release the latch
+        in.read();
+        in.close();
+        readerDoneLatch.countDown();
+        writerDoneLatch.await(2, TimeUnit.SECONDS);
+        assertThat(writerDoneLatch.getCount()).as("Timed out waiting").isEqualTo(0);
+        assertThat(writerException[0]).as("Expecting an exception").isNotNull()
+                .isExactlyInstanceOf(IOException.class).hasMessage("Pipe closed");
     }
 
     private void print(InputStream is) throws IOException {
@@ -89,5 +166,4 @@ public class OutputToInputStreamTest {
         }
         os.close();
     }
-
 }

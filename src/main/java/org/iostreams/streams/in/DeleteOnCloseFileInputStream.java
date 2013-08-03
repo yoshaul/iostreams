@@ -27,6 +27,8 @@ import java.io.IOException;
 
 /**
  * A {@link java.io.FileInputStream} that deletes the underlying file when this file stream is closed.
+ *
+ * @author Yossi Shaul
  */
 public class DeleteOnCloseFileInputStream extends FileInputStream {
     private static final Logger log = LoggerFactory.getLogger(DeleteOnCloseFileInputStream.class);
