@@ -16,11 +16,11 @@
 
 package org.iostreams.streams.in;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.util.concurrent.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An input stream created on-the-fly from an output stream.
@@ -32,9 +32,13 @@ import java.util.concurrent.*;
 public abstract class OutputToInputStream extends InputStream {
     private static final Logger log = LoggerFactory.getLogger(OutputToInputStream.class);
 
+    // Executor service for the writer thread
     private final ExecutorService executor;
+    // Size of the pipe's buffer
+    private final int bufferSize;
+
     private PipedInputStream pipedInputStream;
-    private Future result;
+    private Future writerFuture;
 
     /**
      * Create new <code>OutputToInputStream</code>.
@@ -49,7 +53,18 @@ public abstract class OutputToInputStream extends InputStream {
      * @param executor User provided executor to execute the writing thread
      */
     public OutputToInputStream(ExecutorService executor) {
+        this(executor, 4096);
+    }
+
+    /**
+     * Create new <code>OutputToInputStream</code> with provided executor service for the writing thread.
+     *
+     * @param executor   User provided executor to execute the writing thread
+     * @param bufferSize The size of the buffer used by the input and output streams
+     */
+    public OutputToInputStream(ExecutorService executor, int bufferSize) {
         this.executor = executor;
+        this.bufferSize = bufferSize;
     }
 
     /**
@@ -97,18 +112,18 @@ public abstract class OutputToInputStream extends InputStream {
         }
         pipedInputStream.close();
 
-        if (result == null) {
+        if (writerFuture == null) {
             log.debug("Called close() and result is null");
             return;
         }
-        if (!result.isDone()) {
+        if (!writerFuture.isDone()) {
             log.debug("Stream closed while writer still running");
             return;
         }
 
         try {
             // result is done, check and propagate exception
-            result.get();
+            writerFuture.get();
         } catch (InterruptedException e) {
             throw new IOException(e);
         } catch (ExecutionException e) {
@@ -122,7 +137,8 @@ public abstract class OutputToInputStream extends InputStream {
 
     private void initializePipedStream() throws IOException {
         // lazily init the piped stream and the worker
-        pipedInputStream = new PipedInputStream();
+        log.debug("Initializing piped input stream");
+        pipedInputStream = new PipedInputStream(bufferSize);
         final PipedOutputStream sink = new PipedOutputStream(pipedInputStream);
         Callable worker = new Callable<Void>() {
             @Override
@@ -139,6 +155,6 @@ public abstract class OutputToInputStream extends InputStream {
                 }
             }
         };
-        result = executor.submit(worker);
+        writerFuture = executor.submit(worker);
     }
 }
