@@ -1,4 +1,4 @@
 iostreams
 =========
 
-Set of Java input and output streams
+Set of useful Java input and output streams

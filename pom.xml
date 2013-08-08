@@ -4,17 +4,36 @@
 
     <groupId>org.iostreams</groupId>
     <artifactId>iostreams</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <name>iostreams</name>
     <url>https://github.com/yoshaul/iostreams</url>
 
+    <description>
+        Set of useful Java input and output streams
+    </description>
+    <inceptionYear>2013</inceptionYear>
+
     <developers>
         <developer>
+            <id>yossis</id>
             <name>Yossi Shaul</name>
         </developer>
     </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/yoshaul/iostreams</url>
+        <connection>git@github.com:yoshaul/iostreams.git</connection>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
