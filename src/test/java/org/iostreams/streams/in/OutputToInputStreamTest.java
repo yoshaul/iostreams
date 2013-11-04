@@ -16,6 +16,7 @@
 
 package org.iostreams.streams.in;
 
+import org.iostreams.streams.StreamsTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class OutputToInputStreamTest {
         };
 
         try {
-            consumeAndCloseStream(in);
+            StreamsTestUtils.consumeAndCloseStream(in);
             Assert.fail("Should have thrown io exception");
         } catch (IOException e) {
             // expected the exception thrown by the writer
@@ -149,14 +150,6 @@ public class OutputToInputStreamTest {
         }
         is.close();
         log.debug("Result: {}", stb.toString());
-    }
-
-    private void consumeAndCloseStream(InputStream in) throws IOException {
-        try {
-            while (in.read() > -1) ;
-        } finally {
-            in.close();
-        }
     }
 
     private void copyStringToOut(String string, OutputStream os) throws IOException {
