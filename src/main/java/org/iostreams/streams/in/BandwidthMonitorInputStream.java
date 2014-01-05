@@ -29,12 +29,20 @@ public class BandwidthMonitorInputStream extends FilterInputStream {
 
     @Override
     public int read(byte[] b) throws IOException {
-        throw new UnsupportedOperationException("NOT IMPLEMENTED");
+        int n = in.read(b);
+        if (n > -1) {
+            totalBytesRead += n;
+        }
+        return n;
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        throw new UnsupportedOperationException("NOT IMPLEMENTED");
+        int n = in.read(b, off, len);
+        if (n > -1) {
+            totalBytesRead += n;
+        }
+        return n;
     }
 
     public long getTotalBytesRead() {
