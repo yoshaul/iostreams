@@ -18,9 +18,8 @@ package org.iostreams.streams.in;
 
 import java.io.*;
 import java.util.concurrent.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An input stream created on-the-fly from an output stream.
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Yossi Shaul
  */
 public abstract class OutputToInputStream extends InputStream {
-    private static final Logger log = LoggerFactory.getLogger(OutputToInputStream.class);
+    private static final Logger log = Logger.getLogger(OutputToInputStream.class.getName());
 
     // Executor service for the writer thread
     private final ExecutorService executor;
@@ -107,17 +106,17 @@ public abstract class OutputToInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         if (pipedInputStream == null) {
-            log.debug("Called close() and piped stream is null");
+            log.fine("Called close() and piped stream is null");
             return;
         }
         pipedInputStream.close();
 
         if (writerFuture == null) {
-            log.debug("Called close() and result is null");
+            log.fine("Called close() and result is null");
             return;
         }
         if (!writerFuture.isDone()) {
-            log.debug("Stream closed while writer still running");
+            log.fine("Stream closed while writer still running");
             return;
         }
 
@@ -137,7 +136,7 @@ public abstract class OutputToInputStream extends InputStream {
 
     private void initializePipedStream() throws IOException {
         // lazily init the piped stream and the worker
-        log.debug("Initializing piped input stream");
+        log.fine("Initializing piped input stream");
         pipedInputStream = new PipedInputStream(bufferSize);
         final PipedOutputStream sink = new PipedOutputStream(pipedInputStream);
         Callable worker = new Callable<Void>() {
@@ -150,7 +149,7 @@ public abstract class OutputToInputStream extends InputStream {
                     try {
                         sink.close();
                     } catch (IOException e) {
-                        log.debug("Failed to close piped output stream", e);
+                        log.log(Level.FINE, "Failed to close piped output stream", e);
                     }
                 }
             }

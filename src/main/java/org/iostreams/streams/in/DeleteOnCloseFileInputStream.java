@@ -16,14 +16,13 @@
 
 package org.iostreams.streams.in;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A {@link java.io.FileInputStream} that deletes the underlying file when this file stream is closed.
@@ -31,7 +30,7 @@ import java.io.IOException;
  * @author Yossi Shaul
  */
 public class DeleteOnCloseFileInputStream extends FileInputStream {
-    private static final Logger log = LoggerFactory.getLogger(DeleteOnCloseFileInputStream.class);
+    private static final Logger log = Logger.getLogger(DeleteOnCloseFileInputStream.class.getName());
 
     private final File file;
 
@@ -54,8 +53,8 @@ public class DeleteOnCloseFileInputStream extends FileInputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        log.debug("Deleting {} on close", file.getAbsolutePath());
+        log.log(Level.FINE, "Deleting ''{0}'' on close", file.getAbsolutePath());
         boolean deleted = file.delete();
-        log.debug("File deleted: {}", deleted);
+        log.log(Level.FINE, "File deleted: ''{0}''", deleted);
     }
 }

@@ -19,8 +19,6 @@ package org.iostreams.streams.in;
 import org.iostreams.streams.StreamsTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +26,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -37,7 +37,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Yossi Shaul
  */
 public class OutputToInputStreamTest {
-    private static final Logger log = LoggerFactory.getLogger(OutputToInputStreamTest.class);
+    private static final Logger log = Logger.getLogger(OutputToInputStreamTest.class.getName());
 
     @Test
     public void simpleStringOutToIn() throws IOException {
@@ -149,7 +149,7 @@ public class OutputToInputStreamTest {
             stb.append(new String(buf, 0, read));
         }
         is.close();
-        log.debug("Result: {}", stb.toString());
+        log.log(Level.FINE, "Result: {0}", stb.toString());
     }
 
     private void copyStringToOut(String string, OutputStream os) throws IOException {
