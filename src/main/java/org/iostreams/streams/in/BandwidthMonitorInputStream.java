@@ -45,6 +45,13 @@ public class BandwidthMonitorInputStream extends FilterInputStream {
         return n;
     }
 
+    @Override
+    public long skip(long n) throws IOException {
+        long skipped = super.skip(n);
+        totalBytesRead += skipped;
+        return skipped;
+    }
+
     public long getTotalBytesRead() {
         return totalBytesRead;
     }
