@@ -55,6 +55,7 @@ public class DeleteOnCloseFileInputStream extends FileInputStream {
         super.close();
         log.log(Level.FINE, "Deleting ''{0}'' on close", file.getAbsolutePath());
         boolean deleted = file.delete();
-        log.log(Level.FINE, "File deleted: ''{0}''", deleted);
+        log.log(Level.FINE, "{0}  ''{1}''",
+                new String[]{deleted ? "Deleted" : "Failed deleting", file.getAbsolutePath()});
     }
 }
