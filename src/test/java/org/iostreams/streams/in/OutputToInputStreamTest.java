@@ -70,6 +70,31 @@ public class OutputToInputStreamTest {
     }
 
     @Test
+    public void testExceptionPropagationBeforeClose() throws IOException {
+        InputStream in = new OutputToInputStream() {
+            @Override
+            public void write(OutputStream sink) throws IOException {
+                sink.write(1);  // write something before throwing
+                throw new IllegalMonitorStateException("Tes exception without close");
+            }
+        };
+
+        try {
+            // read the stream without closing it - the writer will throw an exception and we want to propagate it
+            // before close
+            in.read(new byte[1024]);
+            Assert.fail("Should have thrown io exception");
+        } catch (IOException e) {
+            // expected the exception thrown by the writer
+            assertThat(e.getMessage()).endsWith("exception without close");
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalMonitorStateException.class);
+        }
+
+        // make sure the exception is not thrown again when closing the stream
+        in.close();
+    }
+
+    @Test
     public void writerClosesBeforeReaderStarts() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
         OutputToInputStream in = new OutputToInputStream() {

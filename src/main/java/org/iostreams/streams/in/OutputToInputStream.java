@@ -38,6 +38,7 @@ public abstract class OutputToInputStream extends InputStream {
 
     private PipedInputStream pipedInputStream;
     private Future writerFuture;
+    private boolean resultChecked;
 
     /**
      * Create new <code>OutputToInputStream</code>.
@@ -82,7 +83,9 @@ public abstract class OutputToInputStream extends InputStream {
         if (pipedInputStream == null) {
             initializePipedStream();
         }
-        return pipedInputStream.read();
+        int read = pipedInputStream.read();
+        checkForException();
+        return read;
     }
 
     /**
@@ -93,7 +96,9 @@ public abstract class OutputToInputStream extends InputStream {
         if (pipedInputStream == null) {
             initializePipedStream();
         }
-        return pipedInputStream.read(b, off, len);
+        int read = pipedInputStream.read(b, off, len);
+        checkForException();
+        return read;
     }
 
     /**
@@ -120,18 +125,7 @@ public abstract class OutputToInputStream extends InputStream {
             return;
         }
 
-        try {
-            // result is done, check and propagate exception
-            writerFuture.get();
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        } catch (ExecutionException e) {
-            if (e.getCause() != null) {
-                throw new IOException(e.getCause());
-            } else {
-                throw new IOException(e);
-            }
-        }
+        checkForException();
     }
 
     private void initializePipedStream() throws IOException {
@@ -155,5 +149,28 @@ public abstract class OutputToInputStream extends InputStream {
             }
         };
         writerFuture = executor.submit(worker);
+    }
+
+    /**
+     * If the writer thread has finished by the time close is called and it resulted in exception, this method will
+     * throw an <code>IOException</code> wrapping the exception of the writer.
+     *
+     * @throws IOException Wrapper around the original exception thrown by the writing thread
+     */
+    private void checkForException() throws IOException {
+        if (writerFuture.isDone() && !resultChecked) {
+            try {
+                resultChecked = true;   // prevent throwing again when the stream is closed
+                writerFuture.get();
+            } catch (InterruptedException e) {
+                throw new IOException(e);
+            } catch (ExecutionException e) {
+                if (e.getCause() != null) {
+                    throw new IOException(e.getCause());
+                } else {
+                    throw new IOException(e);
+                }
+            }
+        }
     }
 }
