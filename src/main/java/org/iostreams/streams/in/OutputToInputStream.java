@@ -84,7 +84,7 @@ public abstract class OutputToInputStream extends InputStream {
             initializePipedStream();
         }
         int read = pipedInputStream.read();
-        checkForException();
+        checkForException(read);
         return read;
     }
 
@@ -97,7 +97,7 @@ public abstract class OutputToInputStream extends InputStream {
             initializePipedStream();
         }
         int read = pipedInputStream.read(b, off, len);
-        checkForException();
+        checkForException(read);
         return read;
     }
 
@@ -125,7 +125,7 @@ public abstract class OutputToInputStream extends InputStream {
             return;
         }
 
-        checkForException();
+        checkForException(-1);
     }
 
     private void initializePipedStream() throws IOException {
@@ -156,9 +156,10 @@ public abstract class OutputToInputStream extends InputStream {
      * throw an <code>IOException</code> wrapping the exception of the writer.
      *
      * @throws IOException Wrapper around the original exception thrown by the writing thread
+     * @param read  Bytes read by the last read call.
      */
-    private void checkForException() throws IOException {
-        if (writerFuture.isDone() && !resultChecked) {
+    private void checkForException(int read) throws IOException {
+        if ((read < 0 || writerFuture.isDone()) && !resultChecked) {
             try {
                 resultChecked = true;   // prevent throwing again when the stream is closed
                 writerFuture.get();
