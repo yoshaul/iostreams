@@ -1,5 +1,6 @@
 iostreams
 =========
+[![Build Status](https://travis-ci.org/yoshaul/iostreams.svg?branch=master)](https://travis-ci.org/yoshaul/iostreams)
 
 Set of useful Java input and output streams.
 
