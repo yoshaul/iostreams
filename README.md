@@ -1,6 +1,7 @@
 iostreams
 =========
 [![Build Status](https://travis-ci.org/yoshaul/iostreams.svg?branch=master)](https://travis-ci.org/yoshaul/iostreams)
+[![Coverage Status](https://coveralls.io/repos/yoshaul/iostreams/badge.svg?branch=master)](https://coveralls.io/r/yoshaul/iostreams?branch=master)
 
 Set of useful Java input and output streams.
 
