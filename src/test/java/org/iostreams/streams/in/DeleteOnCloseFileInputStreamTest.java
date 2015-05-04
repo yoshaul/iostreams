@@ -51,4 +51,12 @@ public class DeleteOnCloseFileInputStreamTest {
     public void noSuchFile() throws FileNotFoundException {
         new DeleteOnCloseFileInputStream(new File("no/such/file"));
     }
+
+    @Test
+    public void silentlyIgnoreClosingTwice() throws IOException {
+        File file = File.createTempFile("close", "twice");
+        DeleteOnCloseFileInputStream dfis = new DeleteOnCloseFileInputStream(file);
+        dfis.close();
+        dfis.close();
+    }
 }
