@@ -23,8 +23,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -164,6 +167,34 @@ public class OutputToInputStreamTest {
         assertThat(writerDoneLatch.getCount()).as("Timed out waiting").isEqualTo(0);
         assertThat(writerException[0]).as("Expecting an exception").isNotNull()
                 .isExactlyInstanceOf(IOException.class).hasMessage("Pipe closed");
+    }
+
+    @Test
+    public void noShutdownOfExternalThreadExecutor() throws IOException {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        InputStream in = new OutputToInputStream(executorService) {
+            @Override
+            public void write(OutputStream sink) throws IOException {
+                copyStringToOut("test", sink);
+            }
+        };
+        print(in);
+        assertThat(executorService.isShutdown()).isFalse();
+    }
+
+    @Test
+    public void shutdownOfInternalThreadExecutor() throws Exception {
+        InputStream in = new OutputToInputStream() {
+            @Override
+            public void write(OutputStream sink) throws IOException {
+                copyStringToOut("test", sink);
+            }
+        };
+        print(in);
+        Field executorField = OutputToInputStream.class.getDeclaredField("executor");
+        executorField.setAccessible(true);
+        ExecutorService executorService = (ExecutorService) executorField.get(in);
+        assertThat(executorService.isShutdown()).isTrue();
     }
 
     private void print(InputStream is) throws IOException {

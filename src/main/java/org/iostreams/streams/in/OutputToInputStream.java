@@ -35,6 +35,8 @@ public abstract class OutputToInputStream extends InputStream {
     private final ExecutorService executor;
     // Size of the pipe's buffer
     private final int bufferSize;
+    // Shutdown the internally created thread pool
+    private boolean shutdownPool;
 
     private PipedInputStream pipedInputStream;
     private Future writerFuture;
@@ -45,6 +47,7 @@ public abstract class OutputToInputStream extends InputStream {
      */
     public OutputToInputStream() {
         this(Executors.newSingleThreadExecutor());
+        shutdownPool = true;
     }
 
     /**
@@ -125,6 +128,9 @@ public abstract class OutputToInputStream extends InputStream {
             return;
         }
 
+        if (shutdownPool) {
+            executor.shutdown();
+        }
         checkForException(-1);
     }
 
