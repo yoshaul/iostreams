@@ -78,14 +78,14 @@ public class OutputToInputStreamTest {
             @Override
             public void write(OutputStream sink) throws IOException {
                 sink.write(1);  // write something before throwing
-                throw new IllegalMonitorStateException("Tes exception without close");
+                throw new IllegalMonitorStateException("Test exception without close");
             }
         };
 
         try {
             // read the stream without closing it - the writer will throw an exception and we want to propagate it
             // before close
-            in.read(new byte[1024]);
+            while (in.read(new byte[1024]) > -1) ;   // consume the entire stream
             Assert.fail("Should have thrown io exception");
         } catch (IOException e) {
             // expected the exception thrown by the writer
