@@ -105,7 +105,7 @@ public abstract class OutputToInputStream extends InputStream {
     }
 
     /**
-     * Closes the input stream. <p/>
+     * Closes the input stream. <p>
      * If the writer thread has finished by the time close is called and it resulted in exception, this method will
      * throw an <code>IOException</code> wrapping the exception of the writer.
      *
