@@ -18,7 +18,7 @@ Add the following dependency to Maven based builds:
 <dependency>
     <groupId>org.iostreams</groupId>
     <artifactId>iostreams</artifactId>
-    <version>0.2</version>
+    <version>1.0</version>
 </dependency>
 ```
 ### Usage
