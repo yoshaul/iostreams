@@ -1,5 +1,6 @@
 iostreams
 =========
+[![Javadoc](http://javadoc-emblem.rhcloud.com/doc/org.iostreams/iostreams/badge.svg)](http://www.javadoc.io/doc/org.iostreams/iostreams/)
 [![Build Status](https://travis-ci.org/yoshaul/iostreams.svg?branch=master)](https://travis-ci.org/yoshaul/iostreams)
 [![Coverage Status](https://coveralls.io/repos/yoshaul/iostreams/badge.svg?branch=master)](https://coveralls.io/r/yoshaul/iostreams?branch=master)
 
