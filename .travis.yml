@@ -6,15 +6,10 @@ addons:
       secure: 'VZqAItvBNglLS3wU0HmL6TxuseyxWsCU4PKc2Ory+F81C2jomty3kg5WYnfKkS2ofz1L4i6esNqNct8arc2TWwFM8TsNQ4EBg4C7HCwB4pJ2wFbiWp7E0gVuEeFgBKSBJLG+2T49eh8HOrEtg3WlPzxZ+Sta/KQtKVrC1BxX0uE='
 jdk:
   - oraclejdk8
-  - oraclejdk7
-  - openjdk6
+  #- oraclejdk7
+  #- openjdk6
 script:
-  - jdk_switcher use oraclejdk8
   - mvn install sonar:sonar
-  - jdk_switcher use oraclejdk7
-  - mvn install
-  - jdk_switcher use openjdk6
-  - mvn install
 after_success:
   - mvn coveralls:report
 cache:
