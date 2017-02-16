@@ -8,11 +8,15 @@ jdk:
   - oraclejdk8
   - oraclejdk7
   - openjdk6
-script: mvn install sonar:sonar
-
+script:
+  - jdk_switcher use oraclejdk8
+  - mvn install sonar:sonar
+  - jdk_switcher use oraclejdk7
+  - mvn install
+  - jdk_switcher use openjdk6
+  - mvn install
 after_success:
   - mvn coveralls:report
-
 cache:
   directories:
   - "$HOME/.m2"
