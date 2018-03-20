@@ -1,8 +1,9 @@
 iostreams
 =========
-[![Javadoc](http://javadoc-emblem.rhcloud.com/doc/org.iostreams/iostreams/badge.svg)](http://www.javadoc.io/doc/org.iostreams/iostreams/)
+[![Javadocs](https://www.javadoc.io/badge/org.iostreams/iostreams.svg)](https://www.javadoc.io/doc/org.iostreams/iostreams)
 [![Build Status](https://travis-ci.org/yoshaul/iostreams.svg?branch=master)](https://travis-ci.org/yoshaul/iostreams)
 [![Coverage Status](https://coveralls.io/repos/yoshaul/iostreams/badge.svg?branch=master)](https://coveralls.io/r/yoshaul/iostreams?branch=master)
+[![SonarQube Tech Debt](https://img.shields.io/sonar/https/sonarcloud.io/org.iostreams%3Aiostreams/tech_debt.svg)](https://sonarcloud.io/dashboard?id=org.iostreams%3Aiostreams)
 
 Set of useful, production ready, Java input and output streams.
 
